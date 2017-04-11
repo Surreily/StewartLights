@@ -3,22 +3,30 @@
 #include "Pattern.h"
 #include "FirePattern.h"
 
-FirePattern::FirePattern(int len, int base, int range) {
+FirePattern::FirePattern(int len, int color, int range, int sweep = 0) {
 
   // Set the length.
   _len = len;
 
-  // Set the base fire color and the range.
-  _base = base;
+  // Set the color.
+  _color = color;
+  _r = wheelRed(color);
+  _g = wheelGreen(color);
+  _b = wheelBlue(color);
+
+  // Set the range.
   _range = range;
 
-  // Initialize color array.
-  _colors = new int[_len];
+  // Set the sweep.
+  _sweep = sweep;
+  _sweepCounter = 0;
 
-  // Set initial red, green, and blue values.
+  // Initialize brightnesses array.
+  _brightnesses = new int[_len];
+
+  // Set initial brightnesses.
   for (int i=0; i<_len; i++) {
-    _colors[i] = random(0, _range+1);
-    _momentums[i] = random(-3, 4);
+    _brightnesses[i] = random(100-_range, 100);
   }
   
 }
@@ -26,8 +34,7 @@ FirePattern::FirePattern(int len, int base, int range) {
 FirePattern::~FirePattern() {
 
   // Delete the red, green, and blue arrays.
-  delete _colors;
-  delete _momentums;
+  delete _brightnesses;
   
 }
 
@@ -36,17 +43,32 @@ void FirePattern::draw(Adafruit_NeoPixel* strip) {
   // Randomly change the fire.
   for (int i=0; i<_len; i++) {
 
+    // If sweep is not zero, increase the sweep counter.
+    if (_sweep > 0) {
+      
+      _sweepCounter = (_sweepCounter + 1) % _sweep;
+
+      if (_sweepCounter == _sweep-1) {
+        _color = (_color + 1) % 256;
+        _r = wheelRed(_color);
+        _g = wheelGreen(_color);
+        _b = wheelBlue(_color);
+      }
+      
+    }
+
     // Move each pixel.
-    //_momentums[i] = constrain(_momentums[i] + random(-30, 31), -50, 50);
-    _colors[i] = constrain(_colors[i] + random(-(_range/3), _range/3), 0, _range);
-    //if (abs(_colors[i]-25) > 20) _momentums[i] = -_momentums[i];
+    _brightnesses[i] = constrain(_brightnesses[i] + random(-(_range/3), _range/3), 100-_range, 100);
 
     // Set the pixel.
-    strip->setPixelColor(i, wheel(strip, ((_colors[i]+256+_base)-(_range/2))%256));
+    strip->setPixelColor(i, 
+      ceil((float)_r/100.0*(float)_brightnesses[i]),
+      ceil((float)_g/100.0*(float)_brightnesses[i]),
+      ceil((float)_b/100.0*(float)_brightnesses[i]));
     
   }
 
-  // Show the fire.
+  // Show the pixels.
   strip->show();
   
 }

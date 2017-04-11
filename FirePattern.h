@@ -5,20 +5,28 @@ class FirePattern : public Pattern {
 
   public:
 
-    FirePattern(int len, int base, int range);
+    FirePattern(int len, int color, int range, int sweep = 0);
     ~FirePattern();
     
     void draw(Adafruit_NeoPixel* strip);
 
   private:
 
-    // The base color and range of the fire.
-    int _base;
+    // The range of the fire flicker.
     int _range;
 
-    // The colors and momentums of each pixel.
-    int* _colors;
-    int* _momentums;
+    // The base color.
+    int _color;
+    int _r;
+    int _g;
+    int _b;
+
+    // The sweeping speed.
+    int _sweep;
+    int _sweepCounter;
+
+    // The brightnesses of each pixel.
+    int* _brightnesses;
   
 };
 
