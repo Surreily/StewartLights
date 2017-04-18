@@ -10,6 +10,9 @@
 // Define strip length.
 #define STRIP_LENGTH 30
 
+// Define number of available patterns.
+#define NUM_PATTERNS 8
+
 // The LED strip.
 Adafruit_NeoPixel* strip;
 
@@ -46,7 +49,7 @@ void loop() {
   // Check for button press.
   if (digitalRead(BUTTON_PIN) == HIGH) {
     if (buttonTimer == 0) {
-      index = (index + 1) % 8;
+      index = (index + 1) % NUM_PATTERNS;
       delete patt;
       patt = pattFactory->createPattern(index, STRIP_LENGTH);
     }
