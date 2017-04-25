@@ -7,7 +7,7 @@ class StaticPattern : public Pattern {
 
   public:
 
-    StaticPattern(int len, int color);
+    StaticPattern(int len, int color, int sweep = 0);
     ~StaticPattern();
     
     void draw(Adafruit_NeoPixel* strip);
@@ -16,6 +16,10 @@ class StaticPattern : public Pattern {
 
     // The color.
     int _color;
+
+    // The sweeping speed.
+    int _sweep;
+    int _sweepCounter;
   
 };
 

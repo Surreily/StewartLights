@@ -11,7 +11,7 @@
 #define STRIP_LENGTH 30
 
 // Define number of available patterns.
-#define NUM_PATTERNS 8
+#define NUM_PATTERNS 25
 
 // The LED strip.
 Adafruit_NeoPixel* strip;
@@ -53,7 +53,7 @@ void loop() {
       delete patt;
       patt = pattFactory->createPattern(index, STRIP_LENGTH);
     }
-    buttonTimer = 20;
+    buttonTimer = 10;
   }
 
   // Draw the strip.

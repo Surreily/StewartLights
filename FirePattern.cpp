@@ -50,12 +50,18 @@ void FirePattern::draw(Adafruit_NeoPixel* strip) {
 
       if (_sweepCounter == _sweep-1) {
         _color = (_color + 1) % 256;
-        _r = wheelRed(_color);
-        _g = wheelGreen(_color);
-        _b = wheelBlue(_color);
+        //_r = wheelRed(_color);
+        //_g = wheelGreen(_color);
+        //_b = wheelBlue(_color);
       }
       
     }
+
+    // Randomly change each pixel slightly.
+    int randomColor = (256+_color+random(-2, 3))%256;
+    _r = wheelRed(randomColor);
+    _g = wheelGreen(randomColor);
+    _b = wheelBlue(randomColor);
 
     // Move each pixel.
     _brightnesses[i] = constrain(_brightnesses[i] + random(-(_range/3), _range/3), 100-_range, 100);
