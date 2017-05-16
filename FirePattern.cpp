@@ -34,7 +34,7 @@ FirePattern::FirePattern(int len, int color, int range, int sweep = 0) {
 FirePattern::~FirePattern() {
 
   // Delete the red, green, and blue arrays.
-  delete _brightnesses;
+  delete [] _brightnesses;
   
 }
 

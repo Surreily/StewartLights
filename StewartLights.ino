@@ -4,8 +4,8 @@
 #include "Pattern.h"
 
 // Define pins.
-#define STRIP_PIN 13
-#define BUTTON_PIN 2
+#define STRIP_PIN 2
+#define BUTTON_PIN 3
 
 // Define strip length.
 #define STRIP_LENGTH 30

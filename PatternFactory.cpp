@@ -9,9 +9,6 @@
 
 Pattern* PatternFactory::createPattern(int index, int len) {
 
-  Serial.begin(9600);
-  Serial.print("Hello\n");
-
   switch (index) {
     //case 0: return new FirePattern(len, 0, 30);
     //case 1: return new FirePattern(len, 180, 30);
@@ -19,8 +16,8 @@ Pattern* PatternFactory::createPattern(int index, int len) {
     // Fire
     case 0: return new FirePattern(len, 0, 70);
     case 1: return new FirePattern(len, 31, 70);
-    case 2: return new FirePattern(len, 63, 70);
-    case 3: return new FirePattern(len, 95, 70);
+    case 2: return new FirePattern(len, 0, 70);
+    case 3: return new FirePattern(len, 31, 70);
     case 4: return new FirePattern(len, 127, 70);
     case 5: return new FirePattern(len, 159, 70);
     case 6: return new FirePattern(len, 191, 70);
