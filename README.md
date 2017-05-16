@@ -1,75 +1,72 @@
 # Stewart's Lighting
 
-This is a simple lighting project I am working on for my uncle. It uses an Arduino board (or a suitable ATMEGA/ATTINY) to control a string of RGB NeoPixels. The finished product is designed to be connected to a button that cycles through various patterns. 
+This is a simple Arduino project for controlling Adafruit NeoPixel strings. Although it contains everything you need (aside from hardware) to get the lights lit up, you can also add your own patterns (see the documentation below).
 
-As of writing this document, the project is far from finished - there is an unfinished `RainbowPattern` class in here somewhere and the button functionality has yet to be implemented.
+## Hardware
 
-## General Use
+In order to use this program, you will need:
 
-The string length and pins can be defined in the main file.
+* An Arduino or compatible ATMEGA/ATTINY microcontroller.
+* A NeoPixel strip.
+* A button (along with pull-up or pull-down resistor).
+* A power supply.
+* (Optional) A project box.
 
-    #define STRIP_LENGTH 30
+As the project is simple, you should not have much trouble getting everything connected correctly. I recommend testing the lights with the NeoPixel's StrandTest sketch before connecting the button.
 
-    #define STRIP_PIN 13
-    #define BUTTON_PIN 9
+## Software
 
-You can change the default pattern by changing the default index (inside the `setup` method):
+The string length, pins, and other parameters are defined in *Settings.h*.
+
+* `STRIP_PIN` and `BUTTON_PIN` determine which pins on the microcontroller are used for the NeoPixel strip and the button.
+* `STRIP_LENGTH` is the number of NeoPixels being driven.
+* `STRIP_BRIGHTNESS` is the brightness of each NeoPixel (up to a maximum of 100).
+* `DELAY_PERIOD` is the length of time (in milliseconds) that the program waits between loop iterations.
+* `MINIMUM_BUTTON_CYCLES` is the number of loop iterations that the button needs to wait until being activated again (to prevent bouncing).
+
+### Modifying Pattern Sequence
+
+The pattern sequence is defined in the standard Arduino `loop` function. Inside here, each individual pattern function is called.
 
     void setup() {
-        ...
-        index = 4; // Start on the fifth pattern.
+        staticPattern(strip, 0);
+        rainbowPattern(strip, 220);
         ...
     }
+
+Once the final pattern is skipped, the program resumes from the first pattern.
 
 ## Adding Patterns
 
-You can create your own patterns by extending the `Pattern` class. If you extend the constructor, be sure to pass `len` to the base constructor too. Your class should also override the `show` method to implement custom logic.
+You can define your own patterns by creating a header file (which includes the pattern prototype) and a file that contains the actual code that runs. 
 
-You will also need to add the pattern to the `PatternFactory` class's `createPattern(index)` method, and ensure that `NUM_PATTERNS` is set equal to the number of patterns defined inside that method.
+In this documentation, a 'tick' is a single iteration of a pattern - similar to a 'frame' of animation. The `tick` function delays the program before checking the button's state and returning true if it is pressed.
+
+### The Header File
+
+Your header file should include the Adafruit NeoPixel library and contain one prototype for your pattern loop function. The prototype should take an `Adafruit_NeoPixel*` parameter (it is needed to manipulate the LED strip). Don't forget to add header guards and include the Adafruit NeoPixel library!
+
+    // Prototype for pattern loop function
+    void ExamplePatternLoop(Adafruit_NeoPixel* strip, int col);
+
+### The Code File
+
+Your code file should implement the header you created. The function should include a loop that continues until the `tick` function returns true (indicating the button has been pressed).
+
+    void examplePatternLoop(Adafruit_NeoPixel* strip, int col) {
+    
+        // Do something on the first iteration only
+
+        while (!tick()) {
+            // Do something on every loop until the button is pressed
+        }
+
+    }
+
+Any code that executes once per pattern (for example, initializing the LEDs to a specific set of colors) should be put before the loop. Anything that is required to be run on every tick should be placed inside the loop. If a standard while loop (as shown above) is used, the code inside the loop will not be run for the pattern's first tick. Consider using a do-while loop if this is a problem.
 
 ### Helper Functions
 
-The base `Pattern` class includes some helper functions to make patterns easier to produce:
+Helper functions are defined inside *Core.h* and *Core.cpp*. If you intend to use any of these functons, you will need to include *Core.h*.
 
-* *wheel(strip, pos)*: Returns a colour from a given input (from 0 to 255). Passing in 0 returns red, and higher values will return higher values in the colour wheel. This function requires the `Adadruit_NeoPixel` strip object to be passed in.
-* *wheelRed(pos)*, *wheelGreen(pos)*, *wheelBlue(pos)*: Returns the corresponding colour given the position. For example, calling `wheelRed(0)` will return 255, while the other two functions will return 0.
-
-### Example: Static Color Pattern
-
-In this example, we will cover the static pattern included. This pattern displays a single colour and doesn't change. The constructor takes in the required `len` parameter along with a `color` ranging from 0 to 255 that will later be passed into the `wheel` helper function.
-
-    StaticPattern::StaticPattern(int len, int color) {
-        _len = len; // Set the length of LED strip (required).
-        _color = color; // Set private colour property.
-    }
-
-We implement a destructor to free any resources that are removed upon deletion. In this example, we don't need to include any code inside.
-
-    StaticPattern::~StaticPattern() {
-        // Nothing.
-    }
-
-Finally, we implement the `draw` method. This takes an `Adafruit_NeoPixel` parameter that allows us to communicate with the LED strip. We set each LED equal to the `_color` private field and call the `show` function on the strip when done.
-
-    void StaticPattern::draw(Adafruit_NeoPixel* strip) {
-        // Set the pixels.
-        for (int i=0; i<_len; i++) {
-            // We use the wheel helper function to get a color.
-            strip->setPixelColor(i, wheel(strip, _color));
-        }
-        strip->show();
-    }
-
-Finally, we increase `NUM_PATTERNS` in the main file by one and add a new entry to the switch statement inside the `PatternFactory`.
-
-    PatternFactory::createPattern(int index, int len) {
-        switch(index) {
-            ...
-            case 9: return new StaticPattern(len, 0); // Red
-            case 10: return new StaticPattern(len, 80); // Green
-            case 11: return new StaticPattern(len, 160); // Blue
-            ...
-        }
-    }
-
-For a full implementation, check the `StaticPattern.h` and `StaticPattern.cpp` source files.
+* `uint32_t getColor(int color)` - Converts the given color integer (from 0 to 255) into a 'packed' RGB value that can be used in the Adafruit NeoPixel strip object's `setPixelColor` function in place of individual red, green, and blue values.

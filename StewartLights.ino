@@ -1,28 +1,15 @@
 #include <Adafruit_NeoPixel.h>
 
-#include "PatternFactory.h"
-#include "Pattern.h"
+// General includes.
+#include "Core.h"
+#include "Settings.h"
 
-// Define pins.
-#define STRIP_PIN 2
-#define BUTTON_PIN 3
-
-// Define strip length.
-#define STRIP_LENGTH 30
-
-// Define number of available patterns.
-#define NUM_PATTERNS 25
+// Pattern includes.
+#include "StaticPattern.h"
+#include "RainbowPattern.h"
 
 // The LED strip.
 Adafruit_NeoPixel* strip;
-
-// The current pattern.
-int index;
-PatternFactory* pattFactory;
-Pattern* patt;
-
-// The button listen timer.
-int buttonTimer = 0;
 
 void setup() {
 
@@ -30,34 +17,25 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT);
   
   // Initialize the strip.
-  strip = new Adafruit_NeoPixel(30, STRIP_PIN, NEO_GRB + NEO_KHZ800);
+  strip = new Adafruit_NeoPixel(30, STRIP_PIN, NEO_RGB + NEO_KHZ800);
+  strip->setBrightness(STRIP_BRIGHTNESS);
   strip->begin();
-
-  // Set up the current pattern.
-  index = 0;
-  pattFactory = new PatternFactory();
-  patt = pattFactory->createPattern(index, STRIP_LENGTH);
-
+  
 }
 
 void loop() {
 
-  // Decrease the button timer.
-  if (buttonTimer > 0)
-    buttonTimer--;
-
-  // Check for button press.
-  if (digitalRead(BUTTON_PIN) == HIGH) {
-    if (buttonTimer == 0) {
-      index = (index + 1) % NUM_PATTERNS;
-      delete patt;
-      patt = pattFactory->createPattern(index, STRIP_LENGTH);
-    }
-    buttonTimer = 10;
-  }
-
-  // Draw the strip.
-  patt->draw(strip);
-  delay(50);
+  // Call the patterns in sequence.
+  staticPatternLoop(strip, 0);
+  staticPatternLoop(strip, 43);
+  staticPatternLoop(strip, 85);
+  staticPatternLoop(strip, 128);
+  staticPatternLoop(strip, 171);
+  staticPatternLoop(strip, 213);
+  rainbowPatternLoop(strip, 1);
+  rainbowPatternLoop(strip, 2);
+  rainbowPatternLoop(strip, 4);
+  rainbowPatternLoop(strip, 8);
+  rainbowPatternLoop(strip, 16);
 
 }
