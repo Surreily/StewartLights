@@ -57,3 +57,19 @@ uint32_t getColor(int color) {
   
 }
 
+RGB getWheelColor(int pos) {
+
+  pos = (pos+255)%255;
+
+  if (pos < 85) {
+    return {255-pos*3, 0, pos*3};
+  } else if (pos < 170) {
+    pos -= 85;
+    return {0, pos*3, 255-pos*3};
+  } else {
+    pos -= 170;
+    return {pos*3, 255-pos*3, 0};
+  }
+  
+}
+

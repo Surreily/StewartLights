@@ -7,6 +7,7 @@
 // Pattern includes.
 #include "StaticPattern.h"
 #include "RainbowPattern.h"
+#include "FirePattern.h"
 
 // The LED strip.
 Adafruit_NeoPixel* strip;
@@ -26,6 +27,12 @@ void setup() {
 void loop() {
 
   // Call the patterns in sequence.
+  firePatternLoop(strip, 0, 224);
+  firePatternLoop(strip, 43, 224);
+  firePatternLoop(strip, 85, 224);
+  firePatternLoop(strip, 128, 224);
+  firePatternLoop(strip, 171, 224);
+  firePatternLoop(strip, 213, 224);
   staticPatternLoop(strip, 0);
   staticPatternLoop(strip, 43);
   staticPatternLoop(strip, 85);

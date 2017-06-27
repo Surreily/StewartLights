@@ -7,7 +7,7 @@ This is a simple Arduino project for controlling Adafruit NeoPixel strings. Alth
 In order to use this program, you will need:
 
 * An Arduino or compatible ATMEGA/ATTINY microcontroller.
-* A NeoPixel strip.
+* A NeoPixel strip (along with any relevant components).
 * A button (along with pull-up or pull-down resistor).
 * A power supply.
 * (Optional) A project box.
@@ -26,9 +26,9 @@ The string length, pins, and other parameters are defined in *Settings.h*.
 
 ### Modifying Pattern Sequence
 
-The pattern sequence is defined in the standard Arduino `loop` function. Inside here, each individual pattern function is called.
+The pattern sequence is defined in the standard Arduino `loop` function. Inside here, each individual pattern function is called. You can call the same pattern function multiple times with different parameters.
 
-    void setup() {
+    void loop() {
         staticPattern(strip, 0);
         rainbowPattern(strip, 220);
         ...
@@ -41,6 +41,21 @@ Once the final pattern is skipped, the program resumes from the first pattern.
 You can define your own patterns by creating a header file (which includes the pattern prototype) and a file that contains the actual code that runs. 
 
 In this documentation, a 'tick' is a single iteration of a pattern - similar to a 'frame' of animation. The `tick` function delays the program before checking the button's state and returning true if it is pressed.
+
+### RGB Struct
+
+The *core.h* file defines a struct that should be used when working with RGB values. It is defined as follows:
+
+    struct RGB {
+        byte r;
+        byte g;
+        byte b;
+    };
+
+When passing a color to the Adafruit NeoPixel library, you must pass the individual RGB values:
+
+    RGB color = {255, 128, 0};
+    pixels->setPixelColor(i, color.r, color.g, color.b);
 
 ### The Header File
 
@@ -58,7 +73,7 @@ Your code file should implement the header you created. The function should incl
         // Do something on the first iteration only
 
         while (!tick()) {
-            // Do something on every loop until the button is pressed
+            // Do something on every loop until the button is pressed again
         }
 
     }
@@ -69,4 +84,6 @@ Any code that executes once per pattern (for example, initializing the LEDs to a
 
 Helper functions are defined inside *Core.h* and *Core.cpp*. If you intend to use any of these functons, you will need to include *Core.h*.
 
-* `uint32_t getColor(int color)` - Converts the given color integer (from 0 to 255) into a 'packed' RGB value that can be used in the Adafruit NeoPixel strip object's `setPixelColor` function in place of individual red, green, and blue values.
+* `uint32_t getColor(int color)` *Deprecated* - Converts the given color integer (from 0 to 255) into a 'packed' RGB value that can be used in the Adafruit NeoPixel strip object's `setPixelColor` function in place of individual red, green, and blue values.
+
+* `RGB getWheelColor(int pos)` - Converts the given color integer (from 0 to 255) into an RGB type. The range of colors goes from red to green, then to blue, then back to red.
